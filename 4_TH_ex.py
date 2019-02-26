@@ -83,24 +83,30 @@ def getDe(array_type,P,D):
 		factor=2*sqrt(3)
 	De = D*( factor/pi*(P/D)**2 -1)
 	return De
+def getAttr(reactor):
+	assert type(reactor)==Reactor, "expected reactor input"
+	return reactor.k ,reactor.rho ,reactor.mu ,reactor.cp ,reactor.Pr ,reactor.P ,reactor.D 
 if __name__=="__main__":
 	PWR=Reactor("water")
 	SFBR=Reactor("sodium")
-	k	= SFBR.k
-	rho	= SFBR.rho
-	mu	= SFBR.mu
-	cp	= SFBR.cp
-	Pr	= SFBR.Pr
-	P	= SFBR.P
-	D	= SFBR.D
-
-	De=getDe("triangular",P=P,D=D)
-		#Use "square" for PWR
-		#Use "triangular" for SFBR
-	Re=getRe(rho=rho,u=10,D=De,mu=mu)
-	Pe=getPe(Re,Pr)
-
-	Nu=getNu("Kazimi",P=P,D=D,Re=Re,Pr=Pr,Pe=Pe)
+	Rxr=input("Reactor type?")
+	v  =float(input("flow velocity?"))
+	if Rxr=="PWR":
+		k,rho,mu,cp,Pr,P,D = getAttr(PWR)
+		De=getDe("square",P=P,D=D)
+		Re=getRe(rho=rho,u=v,D=De,mu=mu)
+		Pe=getPe(Re,Pr)
+		Nu=getNu("square array",P=P,D=D,Re=Re,Pr=Pr,Pe=Pe)
+	elif Rxr=="SFBR":
+		k,rho,mu,cp,Pr,P,D = getAttr(SFBR)
+		De=getDe("triangular",P=P,D=D)
+		Re=getRe(rho=rho,u=v,D=De,mu=mu)
+		Pe=getPe(Re,Pr)
+		Nu=getNu("Kazimi",P=P,D=D,Re=Re,Pr=Pr,Pe=Pe)
+	print("De=",De)
+	print("Re=",Re)
+	print("Pe=",Pe)
+	print("Nu=",Nu)
 		#use "square array" for PWR
 		#use "Kazimi" for SFBR
 	h =get_h(Nu,k,De)
